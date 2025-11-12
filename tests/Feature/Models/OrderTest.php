@@ -40,4 +40,27 @@ class OrderTest extends TestCase
         $this->assertEquals($idempotencyToken, $order->idempotency_token);
         $this->assertEquals($state, $order->state);
     }
+
+    public function test_is_idempotent_method_returns_true_if_it_is()
+    {
+        $token = '123456';
+        $order = Order::factory()
+            ->idempotencyToken($token)
+            ->create();
+
+        $result = $order->isIdempotent($token);
+
+        $this->assertTrue($result);
+    }
+
+    public function test_is_idempotent_method_returns_false_if_it_is_not()
+    {
+        $order = Order::factory()
+            ->idempotencyToken('123456')
+            ->create();
+
+        $result = $order->isIdempotent('654321');
+
+        $this->assertFalse($result);
+    }
 }
