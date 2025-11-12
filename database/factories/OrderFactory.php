@@ -24,4 +24,9 @@ class OrderFactory extends Factory
             Order::STATE => fake()->randomElement(OrderState::values()),
         ];
     }
+
+    public function idempotencyToken(string $token): self
+    {
+        return $this->state([Order::IDEMPOTENCY_TOKEN => $token]);
+    }
 }
