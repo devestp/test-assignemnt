@@ -5,12 +5,14 @@ namespace App\Models;
 use Core\Database\Eloquent\Model;
 use Database\Factories\OrderFactory;
 use Domain\Enum\OrderState;
+use Domain\Enum\OrderType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property-read int $user_id
  * @property-read float $amount
  * @property-read float $price
+ * @property-read OrderType $type
  * @property-read string $idempotency_token
  * @property-read OrderState $state
  */
@@ -25,6 +27,8 @@ class Order extends Model
 
     public const PRICE = 'price';
 
+    public const TYPE = 'type';
+
     public const IDEMPOTENCY_TOKEN = 'idempotency_token';
 
     public const STATE = 'state';
@@ -33,11 +37,13 @@ class Order extends Model
         self::USER_ID,
         self::AMOUNT,
         self::PRICE,
+        self::TYPE,
         self::IDEMPOTENCY_TOKEN,
         self::STATE,
     ];
 
     protected $casts = [
         self::STATE => OrderState::class,
+        self::TYPE => OrderType::class,
     ];
 }
