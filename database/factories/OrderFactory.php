@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Order;
 use App\Models\User;
 use Domain\Enum\OrderState;
+use Domain\Enum\OrderType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,6 +19,7 @@ class OrderFactory extends Factory
             Order::USER_ID => User::factory(),
             Order::AMOUNT => fake()->randomNumber(),
             Order::PRICE => fake()->randomNumber(),
+            Order::TYPE => fake()->randomElement(OrderType::values()),
             Order::IDEMPOTENCY_TOKEN => fake()->dateTime()->getTimestamp(),
             Order::STATE => fake()->randomElement(OrderState::values()),
         ];
