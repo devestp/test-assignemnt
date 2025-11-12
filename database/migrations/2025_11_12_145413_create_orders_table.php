@@ -22,10 +22,14 @@ return new class extends Migration
 
             $table->float(Order::PRICE, 6);
 
+            // Used raw enum raw values to make sure future changes
+            // to the enum, won't break this migration.
+            $table->enum(Order::TYPE, ['buy', 'sell']);
+
             $table->string(Order::IDEMPOTENCY_TOKEN);
 
-            // Used raw enum values to make sure future changes
-            // to the enum won't break this migration.
+            // Used raw enum raw values to make sure future changes
+            // to the enum, won't break this migration.
             $table->enum(Order::STATE, ['pending', 'completed']);
 
             $table->timestamps();
