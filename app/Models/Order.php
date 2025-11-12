@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Core\Database\Eloquent\Model;
+use Core\Idempotency\Concerns\HasIdempotencyCheck;
+use Core\Idempotency\Contracts\ChecksIdempotency;
 use Database\Factories\OrderFactory;
 use Domain\Enum\OrderState;
 use Domain\Enum\OrderType;
@@ -16,10 +18,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property-read string $idempotency_token
  * @property-read OrderState $state
  */
-class Order extends Model
+class Order extends Model implements ChecksIdempotency
 {
     /** @use HasFactory<OrderFactory> */
     use HasFactory;
+
+    use HasIdempotencyCheck;
 
     public const USER_ID = 'user_id';
 
@@ -46,4 +50,9 @@ class Order extends Model
         self::STATE => OrderState::class,
         self::TYPE => OrderType::class,
     ];
+
+    public function getIdempotencyKey(): string
+    {
+        return self::IDEMPOTENCY_TOKEN;
+    }
 }
