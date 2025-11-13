@@ -16,4 +16,14 @@ class UserFactory extends Factory
             User::EMAIL => fake()->unique()->safeEmail(),
         ];
     }
+
+    public function email(string $email): self
+    {
+        return $this->state([User::EMAIL => $email]);
+    }
+
+    public function hasCredit(float $credit): self
+    {
+        return $this->state([User::CREDIT => $credit]);
+    }
 }
