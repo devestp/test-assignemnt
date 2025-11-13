@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 
 /**
  * @property-read string $email
+ * @property-read float $credit
  */
 class User extends Authenticatable
 {
@@ -17,7 +18,10 @@ class User extends Authenticatable
 
     public const EMAIL = 'email';
 
+    public const CREDIT = 'credit';
+
     protected $fillable = [
         self::EMAIL,
+        self::CREDIT,
     ];
 }
