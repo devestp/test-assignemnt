@@ -32,6 +32,12 @@ return new class extends Migration
             // to the enum, won't break this migration.
             $table->enum(Order::STATE, ['pending', 'completed']);
 
+            $table->foreignId(Order::MATCHED_ORDER_ID)
+                ->nullable()
+                ->references('id')
+                ->on(Table::ORDERS->value)
+                ->restrictOnDelete();
+
             $table->timestamps();
         });
     }
