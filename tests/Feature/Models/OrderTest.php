@@ -15,7 +15,7 @@ class OrderTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_creates()
+    public function test_it_creates_with_only_required_values()
     {
         $user = User::factory()->create();
         $amount = 10;
@@ -39,6 +39,36 @@ class OrderTest extends TestCase
         $this->assertEquals($type, $order->type);
         $this->assertEquals($idempotencyToken, $order->idempotency_token);
         $this->assertEquals($state, $order->state);
+        $this->assertNull($order->matched_order_id);
+    }
+
+    public function test_it_creates_with_all_values()
+    {
+        $user = User::factory()->create();
+        $amount = 10;
+        $price = 11;
+        $type = OrderType::BUY;
+        $idempotencyToken = now()->getTimestamp();
+        $state = OrderState::COMPLETED;
+        $matchedOrder = Order::factory()->create();
+
+        $order = Order::create([
+            Order::USER_ID => $user->getKey(),
+            Order::AMOUNT => $amount,
+            Order::PRICE => $price,
+            Order::TYPE => $type,
+            Order::IDEMPOTENCY_TOKEN => $idempotencyToken,
+            Order::STATE => $state,
+            Order::MATCHED_ORDER_ID => $matchedOrder->getKey(),
+        ]);
+
+        $this->assertEquals($user->getKey(), $order->user_id);
+        $this->assertEquals($amount, $order->amount);
+        $this->assertEquals($price, $order->price);
+        $this->assertEquals($type, $order->type);
+        $this->assertEquals($idempotencyToken, $order->idempotency_token);
+        $this->assertEquals($state, $order->state);
+        $this->assertEquals($matchedOrder->getKey(), $order->matched_order_id);
     }
 
     public function test_is_idempotent_method_returns_true_if_it_is()
