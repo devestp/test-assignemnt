@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property-read OrderType $type
  * @property-read string $idempotency_token
  * @property-read OrderState $state
+ * @property-read ?int $matched_order_id
  */
 class Order extends Model implements ChecksIdempotency
 {
@@ -37,6 +38,8 @@ class Order extends Model implements ChecksIdempotency
 
     public const STATE = 'state';
 
+    public const MATCHED_ORDER_ID = 'matched_order_id';
+
     protected $fillable = [
         self::USER_ID,
         self::AMOUNT,
@@ -44,6 +47,7 @@ class Order extends Model implements ChecksIdempotency
         self::TYPE,
         self::IDEMPOTENCY_TOKEN,
         self::STATE,
+        self::MATCHED_ORDER_ID,
     ];
 
     protected $casts = [
