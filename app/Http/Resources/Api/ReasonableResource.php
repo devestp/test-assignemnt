@@ -7,6 +7,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property-read string $resource
+ *
+ * @method static self make(string $reason)
  */
 class ReasonableResource extends JsonResource
 {
