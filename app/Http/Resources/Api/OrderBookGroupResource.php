@@ -8,6 +8,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property-read GroupedOrder $resource
+ *
+ * @method static self make(GroupedOrder $groupedOrder)
  */
 class OrderBookGroupResource extends JsonResource
 {
