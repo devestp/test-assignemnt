@@ -5,7 +5,7 @@ namespace Domain\Aggregates\OrderBook;
 use Domain\Repositories\OrderBookRepository;
 use Domain\ValueObjects\OrderBook;
 
-readonly class GetOrderBook
+class GetOrderBook
 {
     public function __construct(
         private OrderBookRepository $orderBookRepository
