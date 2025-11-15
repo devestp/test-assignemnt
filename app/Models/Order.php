@@ -6,6 +6,7 @@ use Core\Database\Eloquent\Model;
 use Core\Idempotency\Concerns\HasIdempotencyCheck;
 use Core\Idempotency\Contracts\ChecksIdempotency;
 use Database\Factories\OrderFactory;
+use Domain\Entities\Order as OrderEntity;
 use Domain\Enum\OrderState;
 use Domain\Enum\OrderType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -58,5 +59,16 @@ class Order extends Model implements ChecksIdempotency
     public function getIdempotencyKey(): string
     {
         return self::IDEMPOTENCY_TOKEN;
+    }
+
+    public function toEntity(): OrderEntity
+    {
+        return new OrderEntity(
+            id: $this->getKey(),
+            userId: $this->user_id,
+            amount: $this->amount,
+            price: $this->price,
+            type: $this->type,
+        );
     }
 }

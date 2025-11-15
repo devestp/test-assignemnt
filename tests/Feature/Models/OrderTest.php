@@ -93,4 +93,16 @@ class OrderTest extends TestCase
 
         $this->assertFalse($result);
     }
+
+    public function test_to_entity_method()
+    {
+        $order = Order::factory()->create();
+
+        $entity = $order->toEntity();
+
+        $this->assertEquals($order->getKey(), $entity->getId());
+        $this->assertEquals($order->amount, $entity->getAmount());
+        $this->assertEquals($order->price, $entity->getPrice());
+        $this->assertEquals($order->type, $entity->getType());
+    }
 }
