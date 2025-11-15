@@ -20,7 +20,7 @@ class OrderFactory extends Factory
             Order::AMOUNT => fake()->randomNumber(),
             Order::PRICE => fake()->randomNumber(),
             Order::TYPE => fake()->randomElement(OrderType::values()),
-            Order::IDEMPOTENCY_TOKEN => fake()->dateTime()->getTimestamp(),
+            Order::IDEMPOTENCY_TOKEN => fake()->uuid(),
             Order::STATE => fake()->randomElement(OrderState::values()),
         ];
     }
@@ -28,5 +28,51 @@ class OrderFactory extends Factory
     public function idempotencyToken(string $token): self
     {
         return $this->state([Order::IDEMPOTENCY_TOKEN => $token]);
+    }
+
+    public function type(OrderType $type): self
+    {
+        return $this->state([Order::TYPE => $type]);
+    }
+
+    public function buy(): self
+    {
+        return $this->type(OrderType::BUY);
+    }
+
+    public function sell(): self
+    {
+        return $this->type(OrderType::SELL);
+    }
+
+    public function old(): self
+    {
+        return $this->state(function () {
+            return [
+                Order::CREATED_AT => now()->subDays(
+                    fake()->randomNumber(2),
+                ),
+            ];
+        });
+    }
+
+    public function amount(int $amount): self
+    {
+        return $this->state([Order::AMOUNT => $amount]);
+    }
+
+    public function price(int $price): self
+    {
+        return $this->state([Order::PRICE => $price]);
+    }
+
+    public function completed(): self
+    {
+        return $this->state([Order::STATE => OrderState::COMPLETED]);
+    }
+
+    public function pending(): self
+    {
+        return $this->state([Order::STATE => OrderState::PENDING]);
     }
 }
