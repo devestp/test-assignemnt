@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Core\Foundation\Auth\User as Authenticatable;
 use Database\Factories\UserFactory;
+use Domain\Entities\User as UserEntity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -25,4 +26,13 @@ class User extends Authenticatable
         self::EMAIL,
         self::CREDIT,
     ];
+
+    public function toEntity(): UserEntity
+    {
+        return new UserEntity(
+            id: $this->getKey(),
+            email: $this->email,
+            credit: $this->credit,
+        );
+    }
 }

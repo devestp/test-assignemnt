@@ -39,4 +39,17 @@ class UserTest extends TestCase
         $this->assertEquals($email, $user->email);
         $this->assertEquals($credit, $user->credit);
     }
+
+    public function test_to_entity_method()
+    {
+        $user = User::factory()->create();
+        // Loads default values
+        $user->refresh();
+
+        $entity = $user->toEntity();
+
+        $this->assertEquals($user->getKey(), $entity->getId());
+        $this->assertEquals($user->email, $entity->getEmail());
+        $this->assertEquals($user->credit, $entity->getCredit());
+    }
 }
