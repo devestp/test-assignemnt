@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
+use Brick\Math\BigDecimal;
 use Domain\Enum\OrderType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -40,14 +41,18 @@ class SetOrderRequest extends FormRequest
         ];
     }
 
-    public function getAmount(): float
+    public function getAmount(): BigDecimal
     {
-        return $this->validated(self::AMOUNT);
+        return BigDecimal::of(
+            $this->validated(self::AMOUNT),
+        );
     }
 
-    public function getPrice(): float
+    public function getPrice(): BigDecimal
     {
-        return $this->validated(self::PRICE);
+        return BigDecimal::of(
+            $this->validated(self::PRICE),
+        );
     }
 
     public function getType(): OrderType
