@@ -3,6 +3,7 @@
 namespace Tests\Feature\Repositories;
 
 use App\Models\User;
+use Brick\Math\BigDecimal;
 use Domain\Repositories\UserRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Group;
@@ -18,13 +19,13 @@ class UserRepositoryTest extends TestCase
         $amount = 123.345;
         $user = $this->createUser();
         $userEntity = $user->toEntity();
-        $userEntity->subtractCredit($amount);
+        $userEntity->subtractCredit(BigDecimal::of($amount));
         $repo = $this->createRepository();
 
         $repo->saveCredit($userEntity);
 
         $user->refresh();
-        $this->assertEquals(1000 - $amount, $user->credit);
+        $this->assertTrue($user->credit->isEqualTo(1000 - $amount));
     }
 
     private function createUser(): User
