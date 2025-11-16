@@ -14,6 +14,7 @@ use Domain\Enum\OrderType;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property-read int $user_id
@@ -61,6 +62,11 @@ class Order extends Model implements ChecksIdempotency
         self::STATE => OrderState::class,
         self::TYPE => OrderType::class,
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function getIdempotencyKey(): string
     {
