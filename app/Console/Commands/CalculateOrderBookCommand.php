@@ -14,5 +14,7 @@ class CalculateOrderBookCommand extends Command
     public function handle(CalculateOrderBook $calculateOrderBook): void
     {
         $calculateOrderBook->handle();
+
+        $this->info('Calculated successfully.');
     }
 }
