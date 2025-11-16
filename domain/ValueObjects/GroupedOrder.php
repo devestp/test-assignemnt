@@ -2,14 +2,16 @@
 
 namespace Domain\ValueObjects;
 
+use Brick\Math\BigDecimal;
+
 readonly class GroupedOrder
 {
     public function __construct(
-        private float $price,
+        private BigDecimal $price,
         private int $count,
     ) {}
 
-    public function getPrice(): float
+    public function getPrice(): BigDecimal
     {
         return $this->price;
     }
