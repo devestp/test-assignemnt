@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Entities;
 
+use Brick\Math\BigDecimal;
 use Domain\Entities\User;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -18,12 +19,12 @@ class UserTest extends TestCase
         $user = new User(
             id: $id,
             email: $email,
-            credit: $credit
+            credit: BigDecimal::of($credit),
         );
 
         $this->assertEquals($id, $user->getId());
         $this->assertEquals($email, $user->getEmail());
-        $this->assertEquals($credit, $user->getCredit());
+        $this->assertTrue($user->getCredit()->isEqualTo($credit));
     }
 
     public function test_has_credit_method_returns_true_if_has()
@@ -50,7 +51,7 @@ class UserTest extends TestCase
 
         $user->subtractCredit(100);
 
-        $this->assertEquals(900, $user->getCredit());
+        $this->assertTrue($user->getCredit()->isEqualTo(900));
     }
 
     private function createUser(): User
@@ -58,7 +59,7 @@ class UserTest extends TestCase
         return new User(
             id: 1,
             email: 'test@exmaple.com',
-            credit: 1000,
+            credit: BigDecimal::of(1000),
         );
     }
 }

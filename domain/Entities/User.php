@@ -2,12 +2,14 @@
 
 namespace Domain\Entities;
 
+use Brick\Math\BigDecimal;
+
 class User
 {
     public function __construct(
         private readonly int $id,
         private readonly string $email,
-        private float $credit,
+        private BigDecimal $credit,
     ) {}
 
     public function getId(): int
@@ -20,18 +22,18 @@ class User
         return $this->email;
     }
 
-    public function getCredit(): float
+    public function getCredit(): BigDecimal
     {
         return $this->credit;
     }
 
-    public function hasCredit(float $amount): bool
+    public function hasCredit(BigDecimal|int|float $amount): bool
     {
-        return $this->credit >= $amount;
+        return $this->credit->isGreaterThanOrEqualTo($amount);
     }
 
-    public function subtractCredit(float $amount): void
+    public function subtractCredit(BigDecimal|int|float $amount): void
     {
-        $this->credit -= $amount;
+        $this->credit = $this->credit->minus($amount);
     }
 }
