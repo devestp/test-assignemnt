@@ -18,9 +18,9 @@ return new class extends Migration
                 ->on(Table::USERS->value)
                 ->restrictOnDelete();
 
-            $table->float(Order::AMOUNT, 6);
+            $table->decimal(Order::AMOUNT, 21, 6);
 
-            $table->float(Order::PRICE, 6);
+            $table->decimal(Order::PRICE, 21, 6);
 
             // Used raw enum raw values to make sure future changes
             // to the enum, won't break this migration.
