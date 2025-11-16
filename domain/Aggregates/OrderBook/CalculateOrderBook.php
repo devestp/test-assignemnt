@@ -6,7 +6,7 @@ use Domain\Repositories\OrderBookRepository;
 use Domain\Repositories\OrderRepository;
 use Domain\ValueObjects\OrderBook;
 
-readonly class CalculateOrderBook
+class CalculateOrderBook
 {
     public function __construct(
         private OrderRepository $orderRepository,
