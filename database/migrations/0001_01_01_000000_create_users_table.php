@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string(User::EMAIL)
                 ->unique();
 
-            $table->float(User::CREDIT, 6)
+            $table->decimal(User::CREDIT, 21, 6)
                 ->default(0);
 
             $table->timestamps();
