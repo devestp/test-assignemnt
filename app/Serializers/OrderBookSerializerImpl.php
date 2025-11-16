@@ -3,6 +3,7 @@
 namespace App\Serializers;
 
 use App\Contracts\Serializers\OrderBookSerializer;
+use Brick\Math\BigDecimal;
 use Domain\ValueObjects\GroupedOrder;
 use Domain\ValueObjects\GroupedOrders;
 use Domain\ValueObjects\OrderBook;
@@ -55,7 +56,7 @@ class OrderBookSerializerImpl implements OrderBookSerializer
         return new GroupedOrders(
             collect($data)
                 ->map(fn (array $data) => new GroupedOrder(
-                    price: $data[self::PRICE],
+                    price: BigDecimal::of($data[self::PRICE]),
                     count: $data[self::COUNT],
                 )),
         );
