@@ -2,6 +2,7 @@
 
 namespace Domain\ValueObjects;
 
+use Brick\Math\BigDecimal;
 use Domain\Concerns\HasAdditionalData;
 use Domain\Enum\OrderType;
 
@@ -12,8 +13,8 @@ class CreateOrderData
     public function __construct(
         private readonly int $userId,
         private readonly OrderType $type,
-        private readonly float $amount,
-        private readonly float $price,
+        private readonly BigDecimal $amount,
+        private readonly BigDecimal $price,
     ) {}
 
     public function getUserId(): int
@@ -26,12 +27,12 @@ class CreateOrderData
         return $this->type;
     }
 
-    public function getAmount(): float
+    public function getAmount(): BigDecimal
     {
         return $this->amount;
     }
 
-    public function getPrice(): float
+    public function getPrice(): BigDecimal
     {
         return $this->price;
     }
