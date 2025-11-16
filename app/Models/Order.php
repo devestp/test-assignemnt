@@ -11,6 +11,7 @@ use Database\Factories\OrderFactory;
 use Domain\Entities\Order as OrderEntity;
 use Domain\Enum\OrderState;
 use Domain\Enum\OrderType;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -64,6 +65,18 @@ class Order extends Model implements ChecksIdempotency
     public function getIdempotencyKey(): string
     {
         return self::IDEMPOTENCY_TOKEN;
+    }
+
+    #[Scope]
+    public function completed(Builder $query): void
+    {
+        $query->where(self::STATE, OrderState::COMPLETED);
+    }
+
+    #[Scope]
+    public function pending(Builder $query): void
+    {
+        $query->where(self::STATE, OrderState::PENDING);
     }
 
     public function toEntity(): OrderEntity
