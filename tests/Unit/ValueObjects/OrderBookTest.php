@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ValueObjects;
 
+use Brick\Math\BigDecimal;
 use Domain\ValueObjects\GroupedOrder;
 use Domain\ValueObjects\GroupedOrders;
 use Domain\ValueObjects\OrderBook;
@@ -16,7 +17,7 @@ class OrderBookTest extends TestCase
         $orders = new GroupedOrders(
             collect([
                 new GroupedOrder(
-                    price: 10,
+                    price: BigDecimal::of(10),
                     count: 1,
                 ),
             ]),

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ValueObjects;
 
+use Brick\Math\BigDecimal;
 use Domain\ValueObjects\GroupedOrder;
 use Domain\ValueObjects\GroupedOrders;
 use PHPUnit\Framework\Attributes\Group;
@@ -16,7 +17,7 @@ class GroupedOrdersTest extends TestCase
         $count = 1;
         $orders = collect([
             new GroupedOrder(
-                price: $price,
+                price: BigDecimal::of($price),
                 count: $count
             ),
         ]);
@@ -24,7 +25,7 @@ class GroupedOrdersTest extends TestCase
         $vo = new GroupedOrders($orders);
 
         $this->assertCount(1, $vo->getGroups());
-        $this->assertEquals($price, $vo->getGroups()->first()->getPrice());
+        $this->assertTrue($vo->getGroups()->first()->getPrice()->isEqualTo($price));
         $this->assertEquals($count, $vo->getGroups()->first()->getCount());
     }
 }
