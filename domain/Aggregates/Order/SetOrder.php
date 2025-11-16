@@ -82,7 +82,12 @@ class SetOrder
 
     private function subtractFromUserCredit(User $user, SetOrderData $data): void
     {
-        $user->subtractCredit($data->getAmount());
+        $price = $data->getPrice();
+        $amount = $data->getAmount();
+
+        $user->subtractCredit(
+            $amount->multipliedBy($price),
+        );
 
         $this->userRepository->saveCredit($user);
     }

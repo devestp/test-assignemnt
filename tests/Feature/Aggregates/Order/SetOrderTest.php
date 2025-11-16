@@ -4,6 +4,7 @@ namespace Tests\Feature\Aggregates\Order;
 
 use App\Models\Order;
 use App\Models\User;
+use Brick\Math\BigDecimal;
 use Domain\Aggregates\Order\SetOrder;
 use Domain\Entities\User as UserEntity;
 use Domain\Enum\OrderType;
@@ -108,7 +109,7 @@ class SetOrderTest extends TestCase
     {
         $this->mock(UserRepository::class, function (MockInterface $mock) use ($user, $data) {
             $userEntity = $user->toEntity();
-            $userEntity->subtractCredit($data->getAmount());
+            $userEntity->subtractCredit($data->getAmount()->multipliedBy($data->getPrice()));
 
             $mock->shouldReceive('saveCredit')
                 ->once()
@@ -177,8 +178,8 @@ class SetOrderTest extends TestCase
     {
         return (new SetOrderData(
             type: $type ?? OrderType::BUY,
-            amount: 10,
-            price: 10,
+            amount: BigDecimal::of(10),
+            price: BigDecimal::of(10),
         ))->additional('idempotencyToken', $idempotencyToken ?? Str::uuid());
     }
 
@@ -201,7 +202,7 @@ class SetOrderTest extends TestCase
     private function isUserArgEqualTo(UserEntity $arg, UserEntity $user): bool
     {
         return $arg->getId() === $user->getId() &&
-            $arg->getCredit() === $user->getCredit() &&
+            $arg->getCredit()->isEqualTo($user->getCredit()) &&
             $arg->getEmail() === $user->getEmail();
     }
 }
