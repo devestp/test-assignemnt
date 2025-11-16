@@ -2,6 +2,7 @@
 
 namespace Domain\Entities;
 
+use Brick\Math\BigDecimal;
 use Domain\Enum\OrderType;
 
 class Order
@@ -9,8 +10,8 @@ class Order
     public function __construct(
         private readonly int $id,
         private readonly int $userId,
-        private readonly float $amount,
-        private readonly float $price,
+        private readonly BigDecimal $amount,
+        private readonly BigDecimal $price,
         private readonly OrderType $type,
     ) {}
 
@@ -24,12 +25,12 @@ class Order
         return $this->userId;
     }
 
-    public function getAmount(): float
+    public function getAmount(): BigDecimal
     {
         return $this->amount;
     }
 
-    public function getPrice(): float
+    public function getPrice(): BigDecimal
     {
         return $this->price;
     }
