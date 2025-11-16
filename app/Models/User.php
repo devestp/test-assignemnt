@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Casts\BigDecimalCast;
+use Brick\Math\BigDecimal;
 use Core\Foundation\Auth\User as Authenticatable;
 use Database\Factories\UserFactory;
 use Domain\Entities\User as UserEntity;
@@ -11,7 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @property-read string $email
- * @property-read float $credit
+ * @property-read BigDecimal $credit
  */
 class User extends Authenticatable
 {
@@ -25,6 +27,10 @@ class User extends Authenticatable
     protected $fillable = [
         self::EMAIL,
         self::CREDIT,
+    ];
+
+    protected $casts = [
+        self::CREDIT => BigDecimalCast::class,
     ];
 
     public function toEntity(): UserEntity

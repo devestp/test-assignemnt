@@ -22,7 +22,7 @@ class UserTest extends TestCase
 
         $user->refresh();
         $this->assertEquals($email, $user->email);
-        $this->assertEquals(0, $user->credit);
+        $this->assertTrue($user->credit->isZero());
     }
 
     public function test_it_creates_with_all_values()
@@ -37,7 +37,7 @@ class UserTest extends TestCase
 
         $user->refresh();
         $this->assertEquals($email, $user->email);
-        $this->assertEquals($credit, $user->credit);
+        $this->assertTrue($user->credit->isEqualTo($credit));
     }
 
     public function test_to_entity_method()
