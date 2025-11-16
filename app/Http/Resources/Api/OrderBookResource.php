@@ -27,7 +27,7 @@ class OrderBookResource extends JsonResource
                     $this->resource->getGroupedBuyOrders()->getGroups(),
                 ),
                 self::SELL_ORDERS => OrderBookGroupResource::collection(
-                    $this->resource->getGroupedBuyOrders()->getGroups(),
+                    $this->resource->getGroupedSellOrders()->getGroups(),
                 ),
             ],
         ];
