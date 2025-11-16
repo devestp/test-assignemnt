@@ -3,6 +3,7 @@
 namespace App\Casts;
 
 use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
@@ -28,7 +29,8 @@ class BigDecimalCast implements CastsAttributes
             );
         }
 
-        return (string) BigDecimal::of($value)->toScale(6);
+        return (string) BigDecimal::of($value)
+            ->toScale(6, RoundingMode::HALF_UP);
     }
 
     private function isValueTypeValid(mixed $value): bool
