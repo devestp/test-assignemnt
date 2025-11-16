@@ -1,4 +1,4 @@
-# WallGold - Order Book Trading Platform
+# Order Book Trading Platform
 
 This is a sophisticated order book trading platform built with Laravel, implementing Domain-Driven Design (DDD) principles. The application enables users to create and manage buy/sell orders while maintaining a live order book view. The system handles order matching, credit management, and idempotent transaction processing.
 
