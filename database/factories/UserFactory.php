@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\User;
+use Brick\Math\BigDecimal;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,8 +23,8 @@ class UserFactory extends Factory
         return $this->state([User::EMAIL => $email]);
     }
 
-    public function hasCredit(float $credit): self
+    public function hasCredit(float|BigDecimal $credit): self
     {
-        return $this->state([User::CREDIT => $credit]);
+        return $this->state([User::CREDIT => BigDecimal::of($credit)]);
     }
 }
