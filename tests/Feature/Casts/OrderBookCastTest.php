@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Casts;
+namespace Tests\Feature\Casts;
 
 use App\Casts\OrderBookCast;
 use App\Contracts\Serializers\OrderBookSerializer;
