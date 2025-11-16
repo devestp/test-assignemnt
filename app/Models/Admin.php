@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
-use Core\Database\Eloquent\Model;
+use Core\Foundation\Auth\User as Authenticatable;
 use Database\Factories\AdminFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property-read string $email
  * @property-read string $password
  */
-class Admin extends Model
+class Admin extends Authenticatable implements FilamentUser, HasName
 {
     /** @use HasFactory<AdminFactory> */
     use HasFactory;
@@ -31,4 +34,15 @@ class Admin extends Model
         self::PASSWORD,
         self::REMEMBER_TOKEN,
     ];
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Let all admins access the panel
+        return true;
+    }
+
+    public function getFilamentName(): string
+    {
+        return $this->email;
+    }
 }
