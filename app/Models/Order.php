@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Casts\BigDecimalCast;
+use Brick\Math\BigDecimal;
 use Core\Database\Eloquent\Model;
 use Core\Idempotency\Concerns\HasIdempotencyCheck;
 use Core\Idempotency\Contracts\ChecksIdempotency;
@@ -9,12 +11,13 @@ use Database\Factories\OrderFactory;
 use Domain\Entities\Order as OrderEntity;
 use Domain\Enum\OrderState;
 use Domain\Enum\OrderType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property-read int $user_id
- * @property-read float $amount
- * @property-read float $price
+ * @property-read BigDecimal $amount
+ * @property-read BigDecimal $price
  * @property-read OrderType $type
  * @property-read string $idempotency_token
  * @property-read OrderState $state
@@ -52,6 +55,8 @@ class Order extends Model implements ChecksIdempotency
     ];
 
     protected $casts = [
+        self::PRICE => BigDecimalCast::class,
+        self::AMOUNT => BigDecimalCast::class,
         self::STATE => OrderState::class,
         self::TYPE => OrderType::class,
     ];

@@ -34,8 +34,8 @@ class OrderTest extends TestCase
         ]);
 
         $this->assertEquals($user->getKey(), $order->user_id);
-        $this->assertEquals($amount, $order->amount);
-        $this->assertEquals($price, $order->price);
+        $this->assertTrue($order->amount->isEqualTo($amount));
+        $this->assertTrue($order->price->isEqualTo($price));
         $this->assertEquals($type, $order->type);
         $this->assertEquals($idempotencyToken, $order->idempotency_token);
         $this->assertEquals($state, $order->state);
@@ -63,8 +63,8 @@ class OrderTest extends TestCase
         ]);
 
         $this->assertEquals($user->getKey(), $order->user_id);
-        $this->assertEquals($amount, $order->amount);
-        $this->assertEquals($price, $order->price);
+        $this->assertTrue($order->amount->isEqualTo($amount));
+        $this->assertTrue($order->price->isEqualTo($price));
         $this->assertEquals($type, $order->type);
         $this->assertEquals($idempotencyToken, $order->idempotency_token);
         $this->assertEquals($state, $order->state);
