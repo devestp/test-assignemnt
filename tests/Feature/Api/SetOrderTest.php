@@ -9,11 +9,13 @@ use Database\Factories\OrderFactory;
 use Domain\Aggregates\Order\SetOrder;
 use Domain\Enum\OrderType;
 use Domain\Exceptions\NotEnoughCreditException;
+use Domain\ValueObjects\SetOrderData;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
+use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Group;
 use Tests\TestCase;
@@ -92,14 +94,25 @@ class SetOrderTest extends TestCase
         $this->assertExactOrderExists($order);
     }
 
-    public function test_it_handles_the_request()
+    public function test_it_handles_large_decimal_numbers_passed_in_the_request()
     {
-        $this->mockFunctionalityThatReceives();
+        $data = $this->generateLargeValidData();
+        $this->mockFunctionalityThatReceives($data);
         $this->actingAsUser();
 
-        $testResponse = $this->setOrder(
-            $this->generateValidData(),
-        );
+        $testResponse = $this->setOrder($data);
+
+        $testResponse->assertCreated();
+        $this->assertNoOrderExists();
+    }
+
+    public function test_it_handles_the_request()
+    {
+        $data = $this->generateValidData();
+        $this->mockFunctionalityThatReceives($data);
+        $this->actingAsUser();
+
+        $testResponse = $this->setOrder($data);
 
         $testResponse->assertCreated();
         $this->assertNoOrderExists();
@@ -136,11 +149,12 @@ class SetOrderTest extends TestCase
         });
     }
 
-    private function mockFunctionalityThatReceives(): void
+    private function mockFunctionalityThatReceives(array $data): void
     {
-        $this->mockFunctionality(function (MockInterface $mock) {
+        $this->mockFunctionality(function (MockInterface $mock) use ($data) {
             $mock->shouldReceive('handle')
-                ->once();
+                ->once()
+                ->with(Mockery::on(fn (SetOrderData $arg) => $this->isSetOrderDataArgEqualToRequestData($arg, $data)));
         });
     }
 
@@ -175,6 +189,18 @@ class SetOrderTest extends TestCase
             'amount' => 10,
             'price' => 10,
             'idempotencyToken' => $idempotencyToken ?? Str::uuid(),
+        ];
+    }
+
+    private function generateLargeValidData(): array
+    {
+        return [
+            'type' => OrderType::BUY,
+            // Because PHP cant hold large decimal numbers,
+            // we have to pass them as string
+            'amount' => '10000000000000.123456',
+            'price' => '10000000000000.123456',
+            'idempotencyToken' => Str::uuid(),
         ];
     }
 
@@ -357,5 +383,13 @@ class SetOrderTest extends TestCase
     private function assertNoOrderExists(): void
     {
         $this->assertDatabaseCount(Order::class, 0);
+    }
+
+    private function isSetOrderDataArgEqualToRequestData(SetOrderData $setOrderData, array $data): bool
+    {
+        return $setOrderData->getPrice()->isEqualTo($data['price']) &&
+            $setOrderData->getAmount()->isEqualTo($data['amount']) &&
+            $setOrderData->getType() == $data['type'] &&
+            $setOrderData->getAdditional('idempotencyToken') == $data['idempotencyToken'];
     }
 }
