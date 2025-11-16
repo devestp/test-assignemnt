@@ -3,6 +3,7 @@
 namespace Tests\Feature\Models;
 
 use App\Models\OrderBookSnapshot;
+use Brick\Math\BigDecimal;
 use Domain\ValueObjects\GroupedOrder;
 use Domain\ValueObjects\GroupedOrders;
 use Domain\ValueObjects\OrderBook;
@@ -33,15 +34,15 @@ class OrderBookSnapshotTest extends TestCase
             groupedBuyOrders: new GroupedOrders(
                 collect([
                     new GroupedOrder(
-                        price: 10.5,
+                        price: BigDecimal::of(10.5),
                         count: 2,
                     ),
                     new GroupedOrder(
-                        price: 10,
+                        price: BigDecimal::of(10),
                         count: 15,
                     ),
                     new GroupedOrder(
-                        price: 9.2,
+                        price: BigDecimal::of(9.2),
                         count: 1,
                     ),
                 ])
@@ -49,15 +50,15 @@ class OrderBookSnapshotTest extends TestCase
             groupedSellOrders: new GroupedOrders(
                 collect([
                     new GroupedOrder(
-                        price : 9.1,
+                        price : BigDecimal::of(9.1),
                         count : 5,
                     ),
                     new GroupedOrder(
-                        price : 9.8,
+                        price : BigDecimal::of(9.8),
                         count : 5,
                     ),
                     new GroupedOrder(
-                        price : 10,
+                        price : BigDecimal::of(10),
                         count : 15,
                     ),
                 ])
