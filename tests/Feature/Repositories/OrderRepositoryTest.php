@@ -1,9 +1,10 @@
 <?php
 
-namespace Feature\Repositories;
+namespace Tests\Feature\Repositories;
 
 use App\Models\Order;
 use App\Models\User;
+use Brick\Math\BigDecimal;
 use Domain\Entities\Order as OrderEntity;
 use Domain\Enum\OrderState;
 use Domain\Enum\OrderType;
@@ -30,8 +31,8 @@ class OrderRepositoryTest extends TestCase
         $data = (new CreateOrderData(
             userId: $user->getKey(),
             type: $type,
-            amount: $amount,
-            price: $price,
+            amount: BigDecimal::of($amount),
+            price: BigDecimal::of($price),
         ))->additional('idempotencyToken', $idempotencyToken);
         $repo = $this->createRepository();
 
@@ -79,18 +80,16 @@ class OrderRepositoryTest extends TestCase
 
         $this->assertCount(2, $result->getGroups());
         // First group
-        $this->assertEquals(
-            15,
-            $result->getGroups()->first()->getPrice(),
+        $this->assertTrue(
+            $result->getGroups()->first()->getPrice()->isEqualTo(15),
         );
         $this->assertEquals(
             2,
             $result->getGroups()->first()->getCount()
         );
         // Second group
-        $this->assertEquals(
-            8,
-            $result->getGroups()->skip(1)->first()->getPrice(),
+        $this->assertTrue(
+            $result->getGroups()->skip(1)->first()->getPrice()->isEqualTo(8),
         );
         $this->assertEquals(
             3,
@@ -136,18 +135,16 @@ class OrderRepositoryTest extends TestCase
 
         $this->assertCount(2, $result->getGroups());
         // First group
-        $this->assertEquals(
-            4,
-            $result->getGroups()->first()->getPrice(),
+        $this->assertTrue(
+            $result->getGroups()->first()->getPrice()->isEqualTo(4),
         );
         $this->assertEquals(
             2,
             $result->getGroups()->first()->getCount()
         );
         // Second group
-        $this->assertEquals(
-            10,
-            $result->getGroups()->skip(1)->first()->getPrice(),
+        $this->assertTrue(
+            $result->getGroups()->skip(1)->first()->getPrice()->isEqualTo(10),
         );
         $this->assertEquals(
             3,
@@ -182,7 +179,7 @@ class OrderRepositoryTest extends TestCase
     public function test_get_oldest_matching_order_to_method_returns_null_if_amount_is_not_the_same()
     {
         $order = $this->createBuyOrder();
-        $this->replicateOrder($order, amount: $order->amount + 10);
+        $this->replicateOrder($order, amount: $order->amount->plus(10));
         $repo = $this->createRepository();
 
         $result = $repo->getOldestMatchingOrderTo(
@@ -195,7 +192,7 @@ class OrderRepositoryTest extends TestCase
     public function test_get_oldest_matching_order_to_returns_null_if_price_is_not_the_same()
     {
         $order = $this->createBuyOrder();
-        $this->replicateOrder($order, price: $order->price + 10);
+        $this->replicateOrder($order, price: $order->price->plus(10));
         $repo = $this->createRepository();
 
         $result = $repo->getOldestMatchingOrderTo(
@@ -324,8 +321,8 @@ class OrderRepositoryTest extends TestCase
     private function replicateOrder(
         Order $order,
         ?OrderType $type = null,
-        ?float $amount = null,
-        ?float $price = null,
+        ?BigDecimal $amount = null,
+        ?BigDecimal $price = null,
         ?OrderState $state = null,
     ): Order {
         $new = $order->replicate();
