@@ -11,7 +11,7 @@ interface OrderRepository
     /**
      * Creates new order entity.
      */
-    public function create(CreateOrderData $data): Order;
+    public function createForUpdate(CreateOrderData $data): Order;
 
     /**
      * Gets all pending buy orders grouped and sorted by the price.
@@ -30,7 +30,7 @@ interface OrderRepository
     /**
      * Gets the oldest matching order to given order otherwise null.
      */
-    public function getOldestMatchingOrderTo(Order $order): ?Order;
+    public function getOldestMatchingOrderForUpdate(Order $order): ?Order;
 
     /**
      * Matches two orders with each other.

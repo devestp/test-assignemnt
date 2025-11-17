@@ -14,16 +14,24 @@ use Illuminate\Support\Facades\DB;
 
 class OrderRepositoryImpl implements OrderRepository
 {
-    public function create(CreateOrderData $data): Order
+    public function createForUpdate(CreateOrderData $data): Order
     {
-        return OrderModel::create([
+        $createdOrder = OrderModel::create([
             OrderModel::USER_ID => $data->getUserId(),
             OrderModel::AMOUNT => $data->getAmount(),
             OrderModel::PRICE => $data->getPrice(),
             OrderModel::TYPE => $data->getType(),
             OrderModel::IDEMPOTENCY_TOKEN => $data->getAdditionalOrFail('idempotencyToken'),
             OrderModel::STATE => OrderState::PENDING,
-        ])->toEntity();
+        ]);
+
+        // Another select is needed to ensure the record is locked
+        $lockedOrder = OrderModel::query()
+            ->lockForUpdate()
+            ->whereKey($createdOrder->getKey())
+            ->first();
+
+        return $lockedOrder->toEntity();
     }
 
     public function getPendingBuysForOrderBook(): GroupedOrders
@@ -36,7 +44,7 @@ class OrderRepositoryImpl implements OrderRepository
         return $this->getPendingForOrderBook(OrderType::SELL);
     }
 
-    public function getOldestMatchingOrderTo(Order $order): ?Order
+    public function getOldestMatchingOrderForUpdate(Order $order): ?Order
     {
         return OrderModel::query()
             ->lockForUpdate()
@@ -76,7 +84,6 @@ class OrderRepositoryImpl implements OrderRepository
     private function matchOrderWith(Order $first, Order $second): void
     {
         OrderModel::query()
-            ->lockForUpdate()
             ->whereKey($first->getId())
             ->update([
                 OrderModel::STATE => OrderState::COMPLETED,

@@ -36,7 +36,7 @@ class OrderRepositoryTest extends TestCase
         ))->additional('idempotencyToken', $idempotencyToken);
         $repo = $this->createRepository();
 
-        $createdOrder = $repo->create($data);
+        $createdOrder = $repo->createForUpdate($data);
 
         $this->assertOneOrderExists();
         $this->assertExactOrderExists($createdOrder, $idempotencyToken);
@@ -156,7 +156,7 @@ class OrderRepositoryTest extends TestCase
     {
         $repo = $this->createRepository();
 
-        $result = $repo->getOldestMatchingOrderTo(
+        $result = $repo->getOldestMatchingOrderForUpdate(
             $this->createOrder()->toEntity(),
         );
 
@@ -169,7 +169,7 @@ class OrderRepositoryTest extends TestCase
         $this->replicateOrder($order);
         $repo = $this->createRepository();
 
-        $result = $repo->getOldestMatchingOrderTo(
+        $result = $repo->getOldestMatchingOrderForUpdate(
             $order->toEntity(),
         );
 
@@ -182,7 +182,7 @@ class OrderRepositoryTest extends TestCase
         $this->replicateOrder($order, amount: $order->amount->plus(10));
         $repo = $this->createRepository();
 
-        $result = $repo->getOldestMatchingOrderTo(
+        $result = $repo->getOldestMatchingOrderForUpdate(
             $order->toEntity(),
         );
 
@@ -195,7 +195,7 @@ class OrderRepositoryTest extends TestCase
         $this->replicateOrder($order, price: $order->price->plus(10));
         $repo = $this->createRepository();
 
-        $result = $repo->getOldestMatchingOrderTo(
+        $result = $repo->getOldestMatchingOrderForUpdate(
             $order->toEntity(),
         );
 
@@ -208,7 +208,7 @@ class OrderRepositoryTest extends TestCase
         $this->replicateOrder($order, state: OrderState::COMPLETED);
         $repo = $this->createRepository();
 
-        $result = $repo->getOldestMatchingOrderTo(
+        $result = $repo->getOldestMatchingOrderForUpdate(
             $order->toEntity(),
         );
 
@@ -226,7 +226,7 @@ class OrderRepositoryTest extends TestCase
         $second = $this->replicateOrder($first, type: OrderType::SELL);
         $repo = $this->createRepository();
 
-        $result = $repo->getOldestMatchingOrderTo(
+        $result = $repo->getOldestMatchingOrderForUpdate(
             $second->toEntity(),
         );
 
