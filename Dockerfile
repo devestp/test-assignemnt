@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libicu-dev \
     libxml2-dev \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql intl zip bcmath
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql intl zip bcmath pcntl
 
 # Install Redis extension
 RUN pecl install redis \
