@@ -4,6 +4,7 @@ namespace Domain\Aggregates\Order;
 
 use Domain\Entities\Order;
 use Domain\Entities\User;
+use Domain\Exceptions\EntityNotFoundException;
 use Domain\Exceptions\NotEnoughCreditException;
 use Domain\Exceptions\UserNotAuthenticatedException;
 use Domain\Repositories\OrderRepository;
@@ -29,6 +30,7 @@ class SetOrder
     /**
      * @throws UserNotAuthenticatedException
      * @throws NotEnoughCreditException
+     * @throws EntityNotFoundException
      */
     public function handle(SetOrderData $data): void
     {
@@ -47,14 +49,18 @@ class SetOrder
 
     /**
      * @throws UserNotAuthenticatedException
+     * @throws EntityNotFoundException
      */
-    private function getCurrentUser(): User|HigherOrderTapProxy|null
+    private function getCurrentUser(): User|HigherOrderTapProxy
     {
-        return tap(
-            $this->authService->currentUser(),
-            // Negative space check
-            fn (?User $user) => $user ?? throw new UserNotAuthenticatedException,
-        );
+        $userId = $this->authService->currentUserId();
+
+        // Negative space check
+        if (is_null($userId)) {
+            throw new UserNotAuthenticatedException;
+        }
+
+        return $this->userRepository->findOrFailByIdForUpdate($userId);
     }
 
     private function doesUserHaveEnoughCredit(User $user, SetOrderData $data): bool
@@ -77,7 +83,7 @@ class SetOrder
         // bag, we simply pass the additional data to the next VO
         $createOrderData->additional($setOrderData->getAdditional());
 
-        return $this->orderRepository->create($createOrderData);
+        return $this->orderRepository->createForUpdate($createOrderData);
     }
 
     private function subtractFromUserCredit(User $user, SetOrderData $data): void
@@ -94,7 +100,7 @@ class SetOrder
 
     private function matchWithOppositeOrder(Order $order): void
     {
-        $matchedOrder = $this->orderRepository->getOldestMatchingOrderTo($order);
+        $matchedOrder = $this->orderRepository->getOldestMatchingOrderForUpdate($order);
 
         if (! is_null($matchedOrder)) {
             $this->orderRepository->matchOrders(

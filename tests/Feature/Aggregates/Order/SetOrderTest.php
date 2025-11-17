@@ -6,13 +6,13 @@ use App\Models\Order;
 use App\Models\User;
 use Brick\Math\BigDecimal;
 use Domain\Aggregates\Order\SetOrder;
-use Domain\Entities\User as UserEntity;
 use Domain\Enum\OrderType;
 use Domain\Exceptions\NotEnoughCreditException;
 use Domain\Repositories\OrderRepository;
 use Domain\Repositories\UserRepository;
 use Domain\Services\AuthService;
 use Domain\ValueObjects\CreateOrderData;
+use Domain\ValueObjects\Id;
 use Domain\ValueObjects\SetOrderData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -99,21 +99,26 @@ class SetOrderTest extends TestCase
     private function mockAuthServiceThatReturnsUser(User $user): void
     {
         $this->mock(AuthService::class, function (MockInterface $mock) use ($user) {
-            $mock->shouldReceive('currentUser')
+            $mock->shouldReceive('currentUserId')
                 ->once()
-                ->andReturn($user->toEntity());
+                ->andReturn(new Id($user->getKey()));
         });
     }
 
     private function mockUserRepositoryThatSubtractsUserCredit(User $user, SetOrderData $data): void
     {
         $this->mock(UserRepository::class, function (MockInterface $mock) use ($user, $data) {
+            $mock->shouldReceive('findOrFailByIdForUpdate')
+                ->once()
+                ->with(Mockery::on(fn ($arg) => $this->isIdArgFor($arg, $user)))
+                ->andReturn($user->toEntity());
+
             $userEntity = $user->toEntity();
             $userEntity->subtractCredit($data->getAmount()->multipliedBy($data->getPrice()));
 
             $mock->shouldReceive('saveCredit')
                 ->once()
-                ->with(Mockery::on(fn ($arg) => $this->isUserArgEqualTo($arg, $userEntity)));
+                ->with(Mockery::isEqual($userEntity));
         });
     }
 
@@ -127,7 +132,7 @@ class SetOrderTest extends TestCase
                 ->create()
                 ->toEntity();
 
-            $mock->shouldReceive('create')
+            $mock->shouldReceive('createForUpdate')
                 ->once()
                 ->with(Mockery::on(fn ($arg) => $this->isCreateOrderDataArgEqualToSetOrderData($arg, $data)))
                 ->andReturn($order);
@@ -139,7 +144,7 @@ class SetOrderTest extends TestCase
                 ->create()
                 ->toEntity();
 
-            $mock->shouldReceive('getOldestMatchingOrderTo')
+            $mock->shouldReceive('getOldestMatchingOrderForUpdate')
                 ->once()
                 ->with(Mockery::isSame($order))
                 ->andReturn($matchingOrder);
@@ -160,12 +165,12 @@ class SetOrderTest extends TestCase
                 ->create()
                 ->toEntity();
 
-            $mock->shouldReceive('create')
+            $mock->shouldReceive('createForUpdate')
                 ->once()
                 ->with(Mockery::on(fn ($arg) => $this->isCreateOrderDataArgEqualToSetOrderData($arg, $data)))
                 ->andReturn($order);
 
-            $mock->shouldReceive('getOldestMatchingOrderTo')
+            $mock->shouldReceive('getOldestMatchingOrderForUpdate')
                 ->once()
                 ->with(Mockery::isSame($order))
                 ->andReturn(null);
@@ -199,10 +204,8 @@ class SetOrderTest extends TestCase
             $arg->getAdditional() == $setOrderData->getAdditional();
     }
 
-    private function isUserArgEqualTo(UserEntity $arg, UserEntity $user): bool
+    private function isIdArgFor(Id $arg, User $user): bool
     {
-        return $arg->getId() === $user->getId() &&
-            $arg->getCredit()->isEqualTo($user->getCredit()) &&
-            $arg->getEmail() === $user->getEmail();
+        return $arg->value() == $user->getKey();
     }
 }
