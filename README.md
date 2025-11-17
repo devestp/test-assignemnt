@@ -14,6 +14,7 @@ This is a sophisticated order book trading platform built with Laravel, implemen
 - [Database Design](#database-design)
 - [API Design](#api-design)
 - [Architecture Explanations](#architecture-explanations)
+- [CQRS Order Book Strategy](#cqrs-order-book-strategy)
 - [Code Style Guide](#code-style-guide)
 - [Testing](#testing)
 - [Authentication](#authentication)
@@ -40,6 +41,7 @@ This project is designed as a platform that demonstrates advanced software engin
 - **Idempotent Operations**: Duplicate order requests are safely handled using idempotency tokens
 - **Admin Panel**: Filament-based admin interface for order management
 - **Transaction Safety**: Database transactions ensure data consistency during order processing
+- **CQRS Order Book**: Write-intensive calculations run asynchronously while the read API serves cached snapshots for low-latency queries
 
 ## Tech Stack
 
@@ -109,12 +111,17 @@ The application follows a **layered architecture** with clear boundaries:
    - Install NPM dependencies
    - Build frontend assets
 
-4. **Seed the database (optional)**
+4. **Run database migrations**
+   ```bash
+   docker-compose exec app php artisan migrate
+   ```
+
+5. **Seed the database**
    ```bash
    docker-compose exec app php artisan db:seed
    ```
 
-5. **Access the application**
+6. **Access the application**
    - **API**: http://localhost/api
    - **Admin Panel**: http://localhost/admin
    - **Web Server**: Nginx running on port 80
@@ -128,7 +135,7 @@ The application follows a **layered architecture** with clear boundaries:
 docker-compose exec app php artisan migrate
 
 # Run tests
-docker-compose exec app composer test
+docker-compose exec app php artisan test
 
 # Calculate order book snapshot
 docker-compose exec app php artisan app:calculate-order-book
@@ -500,6 +507,28 @@ Orders are automatically matched when a compatible opposite order exists:
 - Each price level shows the count of orders at that price
 - Buy orders and sell orders are calculated separately
 - Snapshots can be generated via the `app:calculate-order-book` command
+- Reads hit Redis first and transparently fall back to the latest snapshot persisted in PostgreSQL
+
+### CQRS Order Book Strategy
+
+The order book follows a lightweight CQRS approach to keep reads fast without sacrificing precision.
+
+**Command/Write Side**
+- The `Domain\Aggregates\OrderBook\CalculateOrderBook` aggregate groups pending buy/sell orders.
+- The `php artisan app:calculate-order-book` command (run manually or via the `scheduler` service) executes the aggregate.
+- Results are persisted to the `order_book_snapshots` table and serialized into Redis for future reads.
+- Writes remain off the hot path of the user-facing API, so heavy aggregations do not block clients placing new orders.
+
+**Query/Read Side**
+- The `Domain\Aggregates\OrderBook\GetOrderBook` aggregate returns the latest snapshot through the `OrderBookRepository`.
+- The repository first looks in Redis; on a cache miss it retrieves the most recent snapshot from PostgreSQL and refreshes the cache.
+- `GET /api/order-book` uses this read model, guaranteeing O(1) responses that do not require locking or scanning the live orders table.
+
+**Benefits**
+- **Predictable latency**: Reads are decoupled from writes and served from cache.
+- **Scalability**: Heavy calculations run on a schedule, keeping API servers lightweight.
+- **Resilience**: If the cache is flushed, the system automatically falls back to database snapshots.
+
 
 ## Order Simulation
 
