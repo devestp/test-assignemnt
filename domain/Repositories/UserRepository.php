@@ -3,14 +3,20 @@
 namespace Domain\Repositories;
 
 use Domain\Entities\User;
+use Domain\Exceptions\EntityNotFoundException;
+use Domain\ValueObjects\Id;
 
 interface UserRepository
 {
     /**
-     * Persists the user credit.
+     * Finds a user by id for update.
      *
-     * A separate function for this purpose is created to allow
-     * the implementation to use locking.
+     * @throws EntityNotFoundException
+     */
+    public function findOrFailByIdForUpdate(Id $id): User;
+
+    /**
+     * Persists the user credit.
      */
     public function saveCredit(User $user): void;
 }
