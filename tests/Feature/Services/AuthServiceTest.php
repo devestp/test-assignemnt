@@ -17,16 +17,17 @@ class AuthServiceTest extends TestCase
         $this->actingAs($user);
         $service = $this->createService();
 
-        $result = $service->currentUser();
+        $result = $service->currentUserId();
 
-        $this->assertEquals($user->getKey(), $result->getId());
+        $this->assertNotNull($result);
+        $this->assertEquals($user->getKey(), $result->value());
     }
 
     public function test_it_returns_null_if_authenticated()
     {
         $service = $this->createService();
 
-        $result = $service->currentUser();
+        $result = $service->currentUserId();
 
         $this->assertNull($result);
     }

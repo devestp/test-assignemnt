@@ -2,18 +2,20 @@
 
 namespace App\Services;
 
-use App\Models\User as UserModel;
-use Domain\Entities\User;
 use Domain\Services\AuthService;
+use Domain\ValueObjects\Id;
 use Illuminate\Support\Facades\Auth;
 
 class AuthServiceImpl implements AuthService
 {
-    public function currentUser(): ?User
+    public function currentUserId(): ?Id
     {
-        /** @var UserModel|null $user */
-        $user = Auth::user();
+        if (! Auth::check()) {
+            return null;
+        }
 
-        return $user?->toEntity();
+        return new Id(
+            Auth::id(),
+        );
     }
 }
